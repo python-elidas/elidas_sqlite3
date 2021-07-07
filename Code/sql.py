@@ -109,7 +109,7 @@ if __name__ == '__main__':
     update():
         actualiza la infromacion en la columna especificada de una cierta tabla
     list_simple():
-        nos permite ver lainfromacion de una fila dada mediante el key value
+        nos permite ver la infromacion de una fila dada mediante el key value
     list_all():
         nos permite ver toda la infromacion de una tabla
     list_complete():
