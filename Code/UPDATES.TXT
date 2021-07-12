@@ -1,0 +1,21 @@
+#________________________NOTAS Y FUTURAS ACTUALIZACIONES______________________#
+
+@ VERSION 0.1.1
+
+
+
+@ VERSION 0.1.2
+
+Habrá que crear una función que permita modificar todos los datos iguales de
+una tabla, que ejecute la siguiente linea:
+
+      cur.execute("UPDATE ExampleTable SET Age = 18 WHERE Age = 17")
+
+Esta línea lo que hace es cambiar en la tabla "ExampleTable" todos los valores
+18 en la columna "Age" por 17
+
+Teniendo esto en cuenta habría que realizar el siguiente cambio:
+
+update --> update_column
+
+y la nueva función se llamará update_all(table, column, info)
