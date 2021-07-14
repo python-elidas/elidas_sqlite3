@@ -9,7 +9,7 @@ long = (
 
 setup(
     name='simply_sqlite',
-    version='0.1.1',
+    version='0.1.11',
     description='A simplified version of SQLite3',
     long_description=long,
     long_description_content_type='text/markdown',
