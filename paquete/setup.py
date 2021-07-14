@@ -8,10 +8,11 @@ long = (
 )
 
 setup(
-    name='sqlite_easy',
+    name='simply_sqlite',
     version='0.1.1',
     description='A simplified version of SQLite3',
     long_description=long,
+    long_description_content_type='text/markdown',
     classifiers=[
         # Estabilidad del proyecto:
         #   3 - Alpha
@@ -25,7 +26,7 @@ setup(
         # Licencia:
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         # Version de Python
-        'Progamming Language :: Python :: 3',
+        'Programming Language :: Python :: 3',
         # SSistema Operativo
         'Operating System :: OS Independent',
     ],
@@ -33,5 +34,5 @@ setup(
     author='Oscar Gutierrez',
     author_email='pyro.elidas@gmail.com',
     license='GNU GPLv3',
-    packages=['sqlite_easy']
+    packages=['simply_sqlite']
 )

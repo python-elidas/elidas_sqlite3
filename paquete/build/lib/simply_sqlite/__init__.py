@@ -2,6 +2,7 @@
 Author: Oscar Gutierrez
 Email: o.guty66@gmail.com
 Date: 2021-04-22
+Python Version: 3.6.9
 Version: 0.1.1
 '''
 

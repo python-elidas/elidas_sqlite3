@@ -1,9 +1,0 @@
-LICENSE
-MANIFEST.in
-README.md
-setup.py
-sqlite_easy/__init__.py
-sqlite_easy.egg-info/PKG-INFO
-sqlite_easy.egg-info/SOURCES.txt
-sqlite_easy.egg-info/dependency_links.txt
-sqlite_easy.egg-info/top_level.txt

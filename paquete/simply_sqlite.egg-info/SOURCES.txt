@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST.in
+README.md
+setup.py
+simply_sqlite/__init__.py
+simply_sqlite.egg-info/PKG-INFO
+simply_sqlite.egg-info/SOURCES.txt
+simply_sqlite.egg-info/dependency_links.txt
+simply_sqlite.egg-info/top_level.txt
