@@ -2,7 +2,8 @@
 
 @ VERSION 0.1.1
 
-
+Añadir funcion show_column_names devolverá el nombre de las columnas de la
+tabla seleccionada.
 
 @ VERSION 0.1.2
 
@@ -19,3 +20,9 @@ Teniendo esto en cuenta habría que realizar el siguiente cambio:
 update --> update_column
 
 y la nueva función se llamará update_all(table, column, info)
+
+
+@ VERSION 0.1.3
+
+Crear la función gen_table() que use las funciones ya definidas de create_table
+e insert_column para generar una tabla de las al gusto del programador.
