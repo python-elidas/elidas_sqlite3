@@ -35,3 +35,17 @@ Se incluyen la siguientes funciones:
           (val, key)
               {val} Valor nuevo a introducir en la columna establecida
               {key} Key de la fila a modificar.
+
+  show_column_names(self, table):
+        Devuelve los nombres de las columnas de la tabla establecida.
+        {table} Nombre de la tabla de la que se desea saber las columnas.
+
+    show_all_rows(self, table):
+        Devuelve toda la infromación de una tabla dada.
+        {table} Nombre de la tabla de la que se desea saber la información.
+
+    show_one_row(self, table, column, info):
+        Devuelve la informacion de la fila seleccionada
+        {table}  Nombre de la tabla en la que buscar la infromación
+        {column} Nombre de la columna de referencia
+        {info}   Infromacion a buscar en la columna.

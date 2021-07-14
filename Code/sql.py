@@ -4,6 +4,9 @@ Email: o.guty66@gmail.com
 Date: 2021-04-22
 Version: 0.1.1
 '''
+
+# -*- coding: utf-8 -*-
+
 # __LIBRARIES__ #
 import sqlite3
 from sqlite3 import Error
@@ -48,27 +51,50 @@ class SQL:
         )
         self.table_names.append(name)
 
-    def insert_column(self, table, column, type):  # añade columnas a la BDD
+    def insert_column(self, table, column, type):  # inserta columnas a la BDD
         # table = str(input('Introduce el nombre de la Tabla: '))
         # column = str(input('Introduce el nombre de la columna: '))
         # type = str(input('Introduce el tipo de variable (int, char): '))
         self.cursorObj.execute(
             'ALTER TABLE %s ADD COLUMN %s %s' % (table, column, type)
         )
+        self.commit()
 
     def insert_info(self, table, column, info):
         value = (info,)
         self.cursorObj.execute(
             'INSERT INTO %s(%s) VALUES(?)' % (table, column), value
         )
+        self.commit()
 
     def update(self, table, column, key, info):
         self.cursorObj.execute(
             'UPDATE %s SET %s = ? WHERE %s = ?' % (table, column, key), info
         )  # UPDATE Replicas SET Modelo = val1 WHERE SN = val2
+        self.commit()
 
-    def show_single(self):
-        pass
+    def show_all_rows(self, table):
+        self.cursorObj.execute(
+            'SELECT * FROM %s' % (table)
+        )
+        return self.cursorObj.fetchall()
+
+    def show_one_row(self, table, column, info):
+        ind = self.show_column_names(table).index(column)
+        row = [elem for elem in self.show_all_rows(table) if info == elem[ind]]
+        return row
+
+    def show_column_names(self, table):
+        point = self.cursorObj.execute('SELECT * FROM %s' % (table))
+        names = [description[0] for description in point.description]
+        return names
+
+    def delete_row(self, table, column, info):
+        value = (info,)
+        self.cursorObj.execute(
+            'DELETE FROM %s WHERE %s = ?' % (table, column), value
+        )
+        self.commit()
 
     def commit(self):
         self.conn.commit()
@@ -84,10 +110,7 @@ class SQL:
 
 def run():
     db = SQL('Mia')
-    # db.insert_info('Replicas', 'SN', '12345')
-    # db.commit()
-    db.update('Replicas', 'Modelo', 'SN', ('P90', '12345'))
-    db.commit()
+    print(db.show_all_rows('Replicas'))
 
 
 if __name__ == '__main__':
@@ -131,10 +154,20 @@ if __name__ == '__main__':
                 {val} Valor nuevo a introducir en la columna establecida
                 {key} Key de la fila a modificar.
 
-    list_simple():
-        nos permite ver la infromacion de una fila dada mediante el key value
-    list_all():
-        nos permite ver toda la infromacion de una tabla
+    show_column_names(self, table):
+        Devuelve los nombres de las columnas de la tabla establecida.
+        {table} Nombre de la tabla de la que se desea saber las columnas.
+
+    show_all_rows(self, table):
+        Devuelve toda la infromacion de una tabla dada.
+        {table} Nombre de la tabla de la que se desea saber la informacion.
+
+    show_one_row(self, table, column, info):
+        Devuelve la informacion de la fila seleccionada
+        {table}  Nombre de la tabla en la que buscar la infromacion
+        {column} Nombre de la columna de referencia
+        {info}   Infromacion a buscar en la columna.
+
     list_complete():
         nos permite ver toda la informacion en una base de datos
     delete():
