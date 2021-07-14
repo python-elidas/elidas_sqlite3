@@ -1,6 +1,6 @@
 #________________________SEGUIMIENTO DE ACTUALIZACIONES______________________#
 
-@VERSION 0.1.0
+@ VERSION 0.1.0
 
 Creación de las funciones básicas.
 
@@ -34,3 +34,14 @@ la información en un cierto formato.
 
 Crear la función gen_table() que use las funciones ya definidas de create_table
 e insert_column para generar una tabla al gusto del programador.
+
+función delete_empty(table) buscara las filas completamente vacías en la tabla 
+y las eliminará.
+
+@ VERsION 1.0.0
+
+Crear control de errores
+
+@ VERSION 1.5.0
+
+analizar y asegurar el codigo frente a OWASP top 10
