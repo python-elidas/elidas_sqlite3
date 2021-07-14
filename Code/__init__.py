@@ -19,19 +19,11 @@ class SQL:
         self.db_name = name + '.db'
         self.create_connexion()
         self.cursorObj = self.conn.cursor()
-        # try:
-        #    self.find_tables()
-        # except Error:
-        #    self.table_names = list()
-        #    self.create_table()
 
     def create_connexion(self):  # crea la conexion a la BDD o la propia BDD
         self.conn = None  # creamos el objeto conect
-        # print('Estableciendo conexion...')
         try:  # caso de omitir la ruta se crea en el directorio actual
             self.conn = sqlite3.connect(self.db_name)  # crea la BD en la ruta
-            # print('Conexion establecida con exito.')   # especificada
-            # time.sleep(1)
         except Error as e:
             print(e)
 
@@ -43,18 +35,12 @@ class SQL:
             self.table_names.append(str(name)[2:-3])
 
     def create_table(self, name, p_key, typ):  # crea tablas nuevas en la BDD
-        # name = str(input('Introduce el nombre de la Tabla: '))
-        # p_key = str(input('Introduce el Valor Clave de la tabla: '))
-        # typ = str(input('Introduce el tipo de variable (int, char): '))
         self.cursorObj.execute(
             'CREATE TABLE %s(%s %s PRIMARY KEY)' % (name, p_key, typ)
         )
         self.table_names.append(name)
 
     def insert_column(self, table, column, type):  # inserta columnas a la BDD
-        # table = str(input('Introduce el nombre de la Tabla: '))
-        # column = str(input('Introduce el nombre de la columna: '))
-        # type = str(input('Introduce el tipo de variable (int, char): '))
         self.cursorObj.execute(
             'ALTER TABLE %s ADD COLUMN %s %s' % (table, column, type)
         )
