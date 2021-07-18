@@ -29,12 +29,12 @@ class SQL:
             return(e)
 
     def find_tables(self):  # busca y almacena el nombre d ls tablas de la BDD
-        table_names = list()
+        self.table_names = list()
         self.cursorObj.execute(
             'SELECT name FROM sqlite_master WHERE type="table";')
         for name in self.cursorObj.fetchall():
-            table_names.append(str(name)[2:-3])
-        return table_names
+            self.table_names.append(str(name)[2:-3])
+        return self.table_names
 
     def create_table(self, name, p_key, typ):  # crea tablas nuevas en la BDD
         self.cursorObj.execute(
