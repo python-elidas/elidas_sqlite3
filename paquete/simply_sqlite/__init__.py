@@ -3,7 +3,7 @@ Author: Oscar Gutierrez
 Email: o.guty66@gmail.com
 Date: 2021-04-22
 Python Version: 3.6.9
-Version: 0.1.1
+Version: 0.1.12
 '''
 
 # -*- coding: utf-8 -*-
@@ -26,14 +26,15 @@ class SQL:
         try:  # caso de omitir la ruta se crea en el directorio actual
             self.conn = sqlite3.connect(self.db_name)  # crea la BD en la ruta
         except Error as e:
-            print(e)
+            return(e)
 
     def find_tables(self):  # busca y almacena el nombre d ls tablas de la BDD
-        self.table_names = list()
+        table_names = list()
         self.cursorObj.execute(
             'SELECT name FROM sqlite_master WHERE type="table";')
         for name in self.cursorObj.fetchall():
-            self.table_names.append(str(name)[2:-3])
+            table_names.append(str(name)[2:-3])
+        return table_names
 
     def create_table(self, name, p_key, typ):  # crea tablas nuevas en la BDD
         self.cursorObj.execute(
@@ -48,7 +49,7 @@ class SQL:
         self.commit()
 
     def insert_info(self, table, column, info):
-        value = (info,)
+        value = (str(info),)
         self.cursorObj.execute(
             'INSERT INTO %s(%s) VALUES(?)' % (table, column), value
         )
