@@ -16,17 +16,35 @@ from sqlite3 import Error
 
 
 class SQL:
-    def __init__(self, name):
+    def __init__(self, data_base, user='', password='', host='', port=''):
         self.__pk_col = None
-        self.__db_name = name + '.db'
-        self.__create_connection()
-        self.__cursorObj = self.conn.cursor()
+        data_base = self.__define_connection(host, port, user, password, data_base)
+        self.__create_connection(data_base)
+        self.__cursorObj = self.__conn.cursor()
+        
+    def __define_connection(self, host, port, user, password, data_base):
+        string = ''
+        if host!='':
+            string += f'&host={host}'
+        if port!='':
+            string += f'&port={port}'
+        if user!='':
+            string += f'&user={user}'
+        if password!='':
+            string += f'&password={password}'
+        if string != '':
+            return f'file:{data_base}?{string}'
+        else:
+            return data_base
 
-    def __create_connection(self):  # crea la conexión a la BDD o la propia BDD        
-        self.conn = None  # creamos el objeto connect
+    def __create_connection(self, data_base):  # crea la conexión a la BDD o la propia BDD        
+        self.__conn = None  # creamos el objeto connect
         try:  # caso de omitir la ruta se crea en el directorio actual
-            self.conn = sqlite3.connect(self.__db_name)  # crea la BD en la ruta
+            self.__conn = sqlite3.connect(
+                database=data_base
+            )  # crea la BD en la ruta
         except Error as e:
+            print('Connection failed')
             return(e)
         
     def get_pk_column(self, table): #! Pendiente test
@@ -213,7 +231,7 @@ class SQL:
         pass
 
     def __commit(self):
-        self.conn.commit()
+        self.__conn.commit()
 
 
 '''
@@ -225,9 +243,9 @@ class SQL:
 
 
 def run():
-    db = SQL('paquete/simply_sqlite/Mia')
+    db = SQL(data_base='paquete/simply_sqlite/Mia')
     table = 'Replicas'
-    db.new_row(table, '000692', {'Modelo':'Piraña', 'Fabricante':'G&G'}),
+    #db.new_row(table, '000692', {'Modelo':'Piraña', 'Fabricante':'G&G'}),
     print(
         f'tablas: {db.get_tables()}',
         f'columnas :{db.get_column_names(table)}',
