@@ -7,7 +7,7 @@ Creación de las funciones básicas.
 
 @ VERSION 0.1.1
 
-Añadir funcion show_column_names devolverá el nombre de las columnas de la
+Añadir función show_column_names devolverá el nombre de las columnas de la
 tabla seleccionada.
 
 @ VERSION 0.1.2
@@ -26,7 +26,7 @@ update --> update_column
 
 y la nueva función se llamará update_all(table, column, info)
 
-crear la función show_all_info()  que mostrará toda la infromación en la base
+crear la función show_all_info()  que mostrará toda la información en la base
 de datos. También habrá que crear la función print_all_info() que imprimirá
 la información en un cierto formato.
 
@@ -44,4 +44,4 @@ Crear control de errores
 
 @ VERSION 1.5.0
 
-analizar y asegurar el codigo frente a OWASP top 10
+analizar y asegurar el código frente a OWASP top 10
