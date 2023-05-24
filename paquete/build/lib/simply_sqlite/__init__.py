@@ -3,7 +3,7 @@ Author: Oscar Gutierrez
 Email: o.guty66@gmail.com
 Date: 2021-04-22
 Python Version: 3.6.9
-Version: 0.1.12
+Version: 0.1.13
 '''
 
 # -*- coding: utf-8 -*-
@@ -16,76 +16,213 @@ from sqlite3 import Error
 
 
 class SQL:
-    def __init__(self, name):
-        self.db_name = name + '.db'
-        self.create_connexion()
-        self.cursorObj = self.conn.cursor()
+    def __init__(self, data_base):
+        self.__pk_col = None
+        if not '.db' in data_base:
+            data_base = data_base + '.db'
+        self.__create_connection(data_base)
+        self.__cursorObj = self.__conn.cursor()
 
-    def create_connexion(self):  # crea la conexion a la BDD o la propia BDD
-        self.conn = None  # creamos el objeto conect
+    def __create_connection(self, data_base):  # crea la conexión a la BDD o la propia BDD        
+        self.__conn = None  # creamos el objeto connect
         try:  # caso de omitir la ruta se crea en el directorio actual
-            self.conn = sqlite3.connect(self.db_name)  # crea la BD en la ruta
+            self.__conn = sqlite3.connect(
+                database=data_base
+            )  # crea la BD en la ruta
         except Error as e:
+            print('Connection failed')
             return(e)
+        
+    def get_pk_column(self, table):
+        '''
+        Gets the Primary Key column of the table
 
-    def find_tables(self):  # busca y almacena el nombre d ls tablas de la BDD
-        self.table_names = list()
-        self.cursorObj.execute(
-            'SELECT name FROM sqlite_master WHERE type="table";')
-        for name in self.cursorObj.fetchall():
-            self.table_names.append(str(name)[2:-3])
-        return self.table_names
-
-    def create_table(self, name, p_key, typ):  # crea tablas nuevas en la BDD
-        self.cursorObj.execute(
-            'CREATE TABLE %s(%s %s PRIMARY KEY)' % (name, p_key, typ)
+        Args:
+            table (str): table name from which we want to gwt the PK
+        '''
+        self.__cursorObj.execute(
+            'PRAGMA table_info(%s);' % (table)
         )
-        self.table_names.append(name)
+        tabla_info = self.__cursorObj.fetchall()
+        for column in tabla_info:
+            if column[5] == 1:
+                self.__pk_col = column[1]
+                return column[1]
 
-    def insert_column(self, table, column, type):  # inserta columnas a la BDD
-        self.cursorObj.execute(
+    def get_tables(self): 
+        '''
+        Returns a list with the names of the tables in the current DB
+
+        Returns:
+            list: Table names in the current DB
+        '''
+        self.__table_names = list()
+        self.__cursorObj.execute(
+            'SELECT name FROM sqlite_master WHERE type="table";')
+        for name in self.__cursorObj.fetchall():
+            self.__table_names.append(str(name)[2:-3])
+        return self.__table_names
+
+    def create_table(self, name, p_key:tuple=None, kwargs:dict=None):
+        '''
+        Create a new table and sets the primary key
+
+        Args:
+            name (str): Name of the new table
+            p_key (tuple): Pk columns of the table, must be (name, type), if not provided, creates no pk 
+            kwargs (dict): If provided, creates the additional columns of the new table, the structure must be {col_name: col_type}
+        '''
+        if p_key is not None:
+            self.__cursorObj.execute(
+                'CREATE TABLE %s(%s %s PRIMARY KEY)' % (name, p_key[0], p_key[1])
+            )
+        else:
+            col = list(kwargs.keys())[0]
+            self.__cursorObj.execute(
+                'CREATE TABLE %s (%s %s)' % (name, col, kwargs[col])
+            )
+            del kwargs[col]
+        if kwargs is not None:
+            for key in kwargs.keys():
+                self.insert_column(name, key, kwargs[key])
+
+    def insert_column(self, table, column, type):
+        '''
+        creates a new column in the specified table
+
+        Args:
+            table (str): Name of the table in which the column will be created
+            column (str): Name of the new column
+            type (str): Type of the new column
+        '''
+        self.__cursorObj.execute(
             'ALTER TABLE %s ADD COLUMN %s %s' % (table, column, type)
         )
-        self.commit()
+        self.__commit()
 
     def insert_info(self, table, column, info):
+        '''
+        Inserts information in the specified column of the specified table
+
+        Args:
+            table (str): Name of the table 
+            column (str): column in which the information will be inserted
+            info (any): Information to be written in the column
+        '''
         value = (str(info),)
-        self.cursorObj.execute(
+        self.__cursorObj.execute(
             'INSERT INTO %s(%s) VALUES(?)' % (table, column), value
         )
-        self.commit()
+        self.__commit()
 
-    def update(self, table, column, key, info):
-        self.cursorObj.execute(
-            'UPDATE %s SET %s = ? WHERE %s = ?' % (table, column, key), info
+    def update_item(self, table, column, info, key_col=None):
+        '''
+        Updates the specified item
+
+        Args:
+            table (str): Name of the table in which the item is
+            column (str): Name of the column we want to update
+            key_col (str): name of the PK column, if not provided, will get automatically
+            info (tuple): Information provided to update (value, key)
+                value(any): Value to be written in the specified position
+                key (str): key of the row to be updated
+        '''
+        if key_col is None:
+            if self.__pk_col is None:
+                self.get_pk_column(table)
+            key_col = self.__pk_col
+        self.__cursorObj.execute(
+            'UPDATE %s SET %s = ? WHERE %s = ?' % (table, column, key_col), info
         )  # UPDATE Replicas SET Modelo = val1 WHERE SN = val2
-        self.commit()
+        self.__commit()
+    
+    def new_row(self, table, p_key, columns:dict):
+        '''
+        Creates a new row in the specified table
 
-    def show_all_rows(self, table):
-        self.cursorObj.execute(
+        Args:
+            table (str): Table in which we want to create the new row
+            p_key (any): Primary key of the row.
+            columns (dict): Rest of the columns to be created, structure must be {col_name: information}
+        '''
+        if self.__pk_col is None:
+            self.get_pk_column(table)
+        self.insert_info(table, self.__pk_col, p_key)
+        for key in columns.keys():
+            #print(key, columns[key])
+            try:
+                self.update_item(table, key, (columns[key], p_key), self.__pk_col)
+            except:
+                pass
+
+    def get_all_rows(self, table):
+        '''
+        Returns all the row of the selected table
+
+        Args:
+            table (str): Name of the table from which we want to get the information
+
+        Returns:
+            list: All the rows of the specified Table.
+        '''
+        self.__cursorObj.execute(
             'SELECT * FROM %s' % (table)
         )
-        return self.cursorObj.fetchall()
+        return self.__cursorObj.fetchall()
 
-    def show_one_row(self, table, column, info):
-        ind = self.show_column_names(table).index(column)
-        row = [elem for elem in self.show_all_rows(table) if info == elem[ind]]
+    def get_matches(self, table, info, column=None):
+        '''
+        Returns the complete row that contains the given information
+
+        Args:
+            table (str): Table where the information will be searched
+            column (str): Optional. If provided, the information given will be searched in that column.
+            info (any): Information to be searched
+
+        Returns:
+            list: The row that matches de information
+        '''
+        if column is not None:
+            ind = self.get_column_names(table).index(column)
+            row = [elem for elem in self.get_all_rows(table) if info == elem[ind]]
+        else:
+            row = [elem for elem in self.get_all_rows(table) for item in elem if info == item]
         return row
 
-    def show_column_names(self, table):
-        point = self.cursorObj.execute('SELECT * FROM %s' % (table))
+    def get_column_names(self, table):
+        '''
+        Returns the columns in the given table
+
+        Args:
+            table (str): Name of the table from we want ti get the columns
+
+        Returns:
+            list: List of columns from the given table
+        '''
+        point = self.__cursorObj.execute('SELECT * FROM %s' % (table))
         names = [description[0] for description in point.description]
         return names
 
     def delete_row(self, table, column, info):
+        '''
+        Deletes the row with the given information
+
+        Args:
+            table (str): Table from which to delete the row
+            column (str): Column where the coincidence will be searched
+            info (any): Information to be searched for deletion
+        '''
         value = (info,)
-        self.cursorObj.execute(
+        self.__cursorObj.execute(
             'DELETE FROM %s WHERE %s = ?' % (table, column), value
         )
-        self.commit()
+        self.__commit()
+    
+    def update_all(self, table, column, old, new):
+        pass
 
-    def commit(self):
-        self.conn.commit()
+    def __commit(self):
+        self.__conn.commit()
 
 
 '''
@@ -97,8 +234,13 @@ class SQL:
 
 
 def run():
-    db = SQL('Mia')
-    print(db.show_all_rows('Replicas'))
+    db = SQL(data_base='paquete/simply_sqlite/Mia')
+    table = 'Replicas'
+    #db.new_row(table, '0023568', {'Modelo':'Glok23', 'Fabricante':'Glok'})
+    print(
+        db.get_matches(table, info='Glok'),
+        sep = '\n'
+    )
 
 
 if __name__ == '__main__':
@@ -112,54 +254,5 @@ if __name__ == '__main__':
 
     create_connexion():
         Crea la conexion con la base de datos.
-
-    create_tables(name, p_key, typ):
-        crea una tabla con una unica columna.
-        {name}  hace referencia al nombre de la tabla a crear.
-        {p_key} hace referencia al valor clave de la fila.
-        {typ}   almacena el tipo de dato del valor clave.
-
-    insert_column():
-        Inserta columnas nuevas en la tabla establecida
-        {table}  Nombre de la tabla
-        {column} Nombre de la columna
-        {type}   Establece el tipo de caracter almacenado en la columna.
-
-    insert_info(self, table, column, info):
-        Se emplea para insertar informacion en la tabla seleccionada
-        en la columna establecida.
-        {table}  Nombre de la tabla empleada
-        {column} Columna en la que introducir la informacion
-        {info}   infromacion a introdicir en la columna
-
-    update(self, table, column, key, info):
-        actualiza la infromacion en la columna especificada de una cierta tabla
-        {table}  Nombre de la tabla empleada
-        {column} nombre de la columna a actualizar
-        {key}    Nombre de la columna que almacena el key
-        {info}   Tupla con la siguiente estructura:
-            (val, key)
-                {val} Valor nuevo a introducir en la columna establecida
-                {key} Key de la fila a modificar.
-
-    show_column_names(self, table):
-        Devuelve los nombres de las columnas de la tabla establecida.
-        {table} Nombre de la tabla de la que se desea saber las columnas.
-
-    show_all_rows(self, table):
-        Devuelve toda la infromacion de una tabla dada.
-        {table} Nombre de la tabla de la que se desea saber la informacion.
-
-    show_one_row(self, table, column, info):
-        Devuelve la informacion de la fila seleccionada
-        {table}  Nombre de la tabla en la que buscar la infromacion
-        {column} Nombre de la columna de referencia
-        {info}   Infromacion a buscar en la columna.
-
-    list_complete():
-        nos permite ver toda la informacion en una base de datos
-    delete():
-        eliminara la informacion especificada.
-
 '''
 # __BIBLIOGRAPHY__ #

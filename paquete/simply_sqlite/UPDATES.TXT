@@ -2,17 +2,17 @@
 
 @ VERSION 0.1.0
 
-Creación de las funciones básicas.
+[] Creación de las funciones básicas.
 
 
 @ VERSION 0.1.1
 
-Añadir función show_column_names devolverá el nombre de las columnas de la
+[OK] Añadir función show_column_names devolverá el nombre de las columnas de la
 tabla seleccionada.
 
 @ VERSION 0.1.2
 
-Habrá que crear una función que permita modificar todos los datos iguales de
+[] Habrá que crear una función que permita modificar todos los datos iguales de
 una tabla, que ejecute la siguiente linea:
 
       cur.execute("UPDATE ExampleTable SET Age = 18 WHERE Age = 17")
@@ -22,25 +22,28 @@ Esta línea lo que hace es cambiar en la tabla "ExampleTable" todos los valores
 
 Teniendo esto en cuenta habría que realizar el siguiente cambio:
 
-update --> update_column
+[] update --> update_column
 
 y la nueva función se llamará update_all(table, column, info)
 
-crear la función show_all_info()  que mostrará toda la información en la base
-de datos. También habrá que crear la función print_all_info() que imprimirá
+[] Crear la función show_all_info()  que mostrará toda la información en la base
+de datos. 
+[] También habrá que crear la función print_all_info() que imprimirá
 la información en un cierto formato.
 
 @ VERSION 0.1.3
 
-Crear la función gen_table() que use las funciones ya definidas de create_table
+[OK] Crear la función gen_table() que use las funciones ya definidas de create_table
 e insert_column para generar una tabla al gusto del programador.
 
-función delete_empty(table) buscara las filas completamente vacías en la tabla 
+[] función delete_empty(table) buscara las filas completamente vacías en la tabla 
 y las eliminará.
 
-@ VERsION 1.0.0
+@ VERSION 1.0.0
 
-Crear control de errores
+[] Crear la opción de establecer usuario y contraseña para acceder a la tabla
+[] Crear la opción de crear la tabla en un host en la nube.
+[] Crear control de errores
 
 @ VERSION 1.5.0
 

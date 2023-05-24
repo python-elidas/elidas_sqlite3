@@ -9,7 +9,7 @@ long = (
 
 setup(
     name='simply_sqlite',
-    version='0.1.13',
+    version='0.1.16',
     description='A simplified version of SQLite3',
     long_description=long,
     long_description_content_type='text/markdown',
@@ -18,7 +18,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         # Publico Objetivo:
         'Intended Audience :: Developers',
         # Etiqueta:
@@ -31,7 +31,7 @@ setup(
         'Operating System :: OS Independent',
     ],
     keywords='SQLite Database',
-    author='Oscar Gutierrez',
+    author='Elidas',
     author_email='pyro.elidas@gmail.com',
     license='GNU GPLv3',
     packages=['simply_sqlite']

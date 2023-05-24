@@ -16,26 +16,12 @@ from sqlite3 import Error
 
 
 class SQL:
-    def __init__(self, data_base, user='', password='', host='', port=''):
+    def __init__(self, data_base):
         self.__pk_col = None
-        data_base = self.__define_connection(host, port, user, password, data_base)
+        if not '.db' in data_base:
+            data_base = data_base + '.db'
         self.__create_connection(data_base)
         self.__cursorObj = self.__conn.cursor()
-        
-    def __define_connection(self, host, port, user, password, data_base):
-        string = ''
-        if host!='':
-            string += f'&host={host}'
-        if port!='':
-            string += f'&port={port}'
-        if user!='':
-            string += f'&user={user}'
-        if password!='':
-            string += f'&password={password}'
-        if string != '':
-            return f'file:{data_base}?{string}'
-        else:
-            return data_base
 
     def __create_connection(self, data_base):  # crea la conexión a la BDD o la propia BDD        
         self.__conn = None  # creamos el objeto connect
@@ -47,7 +33,7 @@ class SQL:
             print('Connection failed')
             return(e)
         
-    def get_pk_column(self, table): #! Pendiente test
+    def get_pk_column(self, table):
         '''
         Gets the Primary Key column of the table
 
@@ -77,23 +63,28 @@ class SQL:
             self.__table_names.append(str(name)[2:-3])
         return self.__table_names
 
-    def create_table(self, name, p_key, typ, **kwargs): #! Pendiente test 
+    def create_table(self, name, p_key:tuple=None, kwargs:dict=None):
         '''
         Create a new table and sets the primary key
 
         Args:
             name (str): Name of the new table
-            p_key (str): Name of the PK column
-            typ (str): type if the PK column
+            p_key (tuple): Pk columns of the table, must be (name, type), if not provided, creates no pk 
             kwargs (dict): If provided, creates the additional columns of the new table, the structure must be {col_name: col_type}
         '''
-        self.__cursorObj.execute(
-            'CREATE TABLE %s(%s %s PRIMARY KEY)' % (name, p_key, typ)
-        )
-        if not kwargs == None:
+        if p_key is not None:
+            self.__cursorObj.execute(
+                'CREATE TABLE %s(%s %s PRIMARY KEY)' % (name, p_key[0], p_key[1])
+            )
+        else:
+            col = list(kwargs.keys())[0]
+            self.__cursorObj.execute(
+                'CREATE TABLE %s (%s %s)' % (name, col, kwargs[col])
+            )
+            del kwargs[col]
+        if kwargs is not None:
             for key in kwargs.keys():
                 self.insert_column(name, key, kwargs[key])
-        self.__table_names.append(name)
 
     def insert_column(self, table, column, type):
         '''
@@ -160,7 +151,7 @@ class SQL:
         for key in columns.keys():
             #print(key, columns[key])
             try:
-                self.update_item(table, key, self.__pk_col, (columns[key], p_key))
+                self.update_item(table, key, (columns[key], p_key), self.__pk_col)
             except:
                 pass
 
@@ -179,7 +170,7 @@ class SQL:
         )
         return self.__cursorObj.fetchall()
 
-    def get_row(self, table, info, column=None): #! pendiente test
+    def get_matches(self, table, info, column=None):
         '''
         Returns the complete row that contains the given information
 
@@ -245,13 +236,9 @@ class SQL:
 def run():
     db = SQL(data_base='paquete/simply_sqlite/Mia')
     table = 'Replicas'
-    #db.new_row(table, '000692', {'Modelo':'Piraña', 'Fabricante':'G&G'}),
+    #db.new_row(table, '0023568', {'Modelo':'Glok23', 'Fabricante':'Glok'})
     print(
-        f'tablas: {db.get_tables()}',
-        f'columnas :{db.get_column_names(table)}',
-        f'PK: {db.get_pk_column(table)}',
-        f'Filas: {db.get_all_rows(table)}',
-        #db.get_all_rows(table),
+        db.get_matches(table, info='Glok'),
         sep = '\n'
     )
 
